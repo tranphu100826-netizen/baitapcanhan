@@ -1,0 +1,19 @@
+Tại sao in ra 17 chứ không phải 42?
+Khi fork() được gọi, hệ điều hành tạo ra tiến trình con là bản sao hoàn toàn của tiến trình cha. Sau đó 2 tiến trình chạy độc lập, mỗi tiến trình có vùng nhớ riêng:
+int num_coconuts = 17
+        │
+      fork()
+        │
+   ┌────┴────┐
+   │         │
+  CON       CHA
+(pid==0)  (pid>0)
+   │         │
+num=42    wait(NULL)  ← chờ con xong
+   │         │
+exit(0)   printf num_coconuts
+(không        = 17  ← vùng nhớ riêng,
+ in gì)         không bị thay đổi
+
+Tiến trình con: gán num_coconuts = 42 nhưng chỉ thay đổi trong vùng nhớ của con, rồi exit(0) — không in gì.
+Tiến trình cha: gọi wait(NULL) chờ con kết thúc, biến num_coconuts của cha vẫn là 17 vì 2 tiến trình không chia sẻ vùng nhớ với nhau, rồi in ra I see 17 coconuts!.
